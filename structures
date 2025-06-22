@@ -1,0 +1,146 @@
+#include <stdio.h>
+#include <string.h>
+
+// Define the structure for storing student data
+struct Student {
+    char name[50];
+    int rollNumber;
+    char course[30];
+    float marks[5];
+    float averageMarks;
+};
+
+// Function Prototypes
+void inputStudent(struct Student students[], int *n);
+void calculateAverageMarks(struct Student *student);
+void displayAboveAverage(struct Student students[], int n);
+void sortStudentsByRollNumber(struct Student students[], int n);
+void searchStudentByRollNumber(struct Student students[], int n, int roll);
+void menu();
+
+// Function to display the menu options
+void menu() {
+    printf("\nMenu:\n");
+    printf("1. Add new student\n");
+    printf("2. View students with average marks above 60\n");
+    printf("3. Search student by roll number\n");
+    printf("4. Sort and display students by roll number\n");
+    printf("5. Exit\n");
+}
+
+// Function to input details for students
+void inputStudent(struct Student students[], int *n) {
+    printf("Enter details for student %d:\n", *n + 1);
+    printf("Name: ");
+    getchar(); // Clear the newline character left in the input buffer
+    fgets(students[*n].name, sizeof(students[*n].name), stdin);
+    students[*n].name[strcspn(students[*n].name, "\n")] = '\0'; // Remove newline
+
+    printf("Roll Number: ");
+    scanf("%d", &students[*n].rollNumber);
+
+    printf("Course: ");
+    getchar(); // Clear the newline character
+    fgets(students[*n].course, sizeof(students[*n].course), stdin);
+    students[*n].course[strcspn(students[*n].course, "\n")] = '\0'; // Remove newline
+
+    printf("Enter marks for 5 subjects:\n");
+    for (int i = 0; i < 5; i++) {
+        printf("Mark %d: ", i + 1);
+        scanf("%f", &students[*n].marks[i]);
+    }
+
+    calculateAverageMarks(&students[*n]);
+    (*n)++;
+}
+
+// Function to calculate average marks
+void calculateAverageMarks(struct Student *student) {
+    float total = 0;
+    for (int i = 0; i < 5; i++) {
+        total += student->marks[i];
+    }
+    student->averageMarks = total / 5;
+}
+
+// Function to display students with average marks above 60
+void displayAboveAverage(struct Student students[], int n) {
+    printf("Students with average marks above 60:\n");
+    for (int i = 0; i < n; i++) {
+        if (students[i].averageMarks > 60) {
+            printf("Name: %s, Roll Number: %d, Course: %s, Average Marks: %.2f\n",
+                   students[i].name, students[i].rollNumber, students[i].course, students[i].averageMarks);
+        }
+    }
+}
+
+// Function to sort students by roll number
+void sortStudentsByRollNumber(struct Student students[], int n) {
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            if (students[j].rollNumber > students[j + 1].rollNumber) {
+                struct Student temp = students[j];
+                students[j] = students[j + 1];
+                students[j + 1] = temp;
+            }
+        }
+    }
+}
+
+// Function to search and display a student by roll number
+void searchStudentByRollNumber(struct Student students[], int n, int roll) {
+    for (int i = 0; i < n; i++) {
+        if (students[i].rollNumber == roll) {
+            printf("Student found:\n");
+            printf("Name: %s, Roll Number: %d, Course: %s, Average Marks: %.2f\n",
+                   students[i].name, students[i].rollNumber, students[i].course, students[i].averageMarks);
+            return;
+        }
+    }
+    printf("Student with Roll Number %d not found.\n", roll);
+}
+
+// Main function with menu-driven program
+int main() {
+    int choice, n = 0;
+    struct Student students[100];
+
+    while (1) {
+        menu();
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                inputStudent(students, &n);
+                break;
+
+            case 2:
+                displayAboveAverage(students, n);
+                break;
+
+            case 3:
+                printf("Enter Roll Number to search: ");
+                int roll;
+                scanf("%d", &roll);
+                searchStudentByRollNumber(students, n, roll);
+                break;
+
+            case 4:
+                sortStudentsByRollNumber(students, n);
+                printf("Students sorted by roll number:\n");
+                for (int i = 0; i < n; i++) {
+                    printf("Name: %s, Roll Number: %d, Course: %s, Average Marks: %.2f\n",
+                           students[i].name, students[i].rollNumber, students[i].course, students[i].averageMarks);
+                }
+                break;
+
+            case 5:
+                return 0;
+
+            default:
+                printf("Invalid choice. Try again.\n");
+        }
+    }
+    return 0;
+}
